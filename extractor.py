@@ -1,12 +1,6 @@
 """
-extractor.py
-------------
-Extracts structured fields from raw FNOL text.
+Intelligence layer for extracting and validating FNOL (First Notice of Loss) data.
 
-Strategy: try the LLM first (it understands varied phrasing/layout, which is
-what makes this an "agent" rather than a rigid parser). If the LLM is
-unavailable or returns something that fails schema validation, fall back to
-regex extraction so the demo never produces an empty/broken result.
 """
 
 import re

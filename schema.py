@@ -1,18 +1,5 @@
 """
-schema.py
----------
-Defines the exact data structure the agent must extract from every FNOL
-document. Using Pydantic gives us automatic validation: if the LLM returns
-malformed JSON or the wrong data type, we catch it immediately instead of
-crashing later in the pipeline.
-
-All fields are Optional[str] because at extraction time we don't yet know
-what is present in the document -- that's exactly what "missing field
-detection" is for. Keeping everything as strings (rather than int/float/date)
-avoids type-conversion crashes when the LLM returns something slightly
-off-format (e.g. "25,000" instead of 25000); we parse/clean values later in
-a controlled way (see utils.py) instead of letting a strict type kill the
-whole pipeline.
+Defines the exact data structure used throughout the project. This file acts as the foundation of the application. It specifies what information must be extracted from every FNOL document and validates the extracted data before it moves to the routing engine.
 """
 
 from typing import Optional, List
@@ -67,8 +54,8 @@ class FNOLExtraction(BaseModel):
         return flat
 
 
-# Master list of mandatory fields, used for missing-field detection.
-# This is the single source of truth -- if the spec changes, update only here.
+#  used for missing-field detection.
+# "Instead of writing these field names repeatedly in different files, I created one master list here."
 MANDATORY_FIELDS = [
     "policy_number", "policyholder_name", "effective_dates",
     "date", "time", "location", "description",

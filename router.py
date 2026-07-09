@@ -1,17 +1,10 @@
 """
-router.py
----------
 Deterministic logic for:
   1. Detecting missing mandatory fields.
   2. Deciding the routing decision.
 
-IMPORTANT DESIGN DECISION:
-Routing NEVER depends on the LLM. Extraction can use AI (that's the "agent"
-part), but the actual business decision -- which queue a claim goes to --
-is plain, testable Python. This guarantees:
-  - The same input always produces the same route (no LLM non-determinism).
-  - The system still works correctly even if the LLM/Ollama is down.
-  - The decision is fully auditable -- you can point to the exact rule that fired.
+This is the decision-making engine of the application.
+     where this validates whether required information is present, checks for fraud indicators, evaluates injury claims, compares the estimated damage against the business threshold, and finally returns both the recommended claim route and a clear explanation. By using deterministic rules instead of AI for routing, the application remains consistent, transparent, and production-ready
 """
 
 import re

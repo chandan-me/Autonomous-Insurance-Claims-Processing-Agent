@@ -69,7 +69,6 @@ This architecture ensures that reporting failures never impact the core claims p
 - AI-assisted extraction using Ollama Cloud
 - Automatic regex fallback
 - TXT & PDF support
-- Upload up to 4 FNOL documents
 - Streamlit dashboard
 - Rule-based routing engine
 - Excel audit log
@@ -150,10 +149,46 @@ If no API key is available, the application automatically switches to regex extr
 ```bash
 streamlit run app.py
 ```
-
-Visit:
-
-http://localhost:8501
+## Complete Flow
+```
+      User Opens App
+            │
+            ▼
+      Upload TXT / PDF
+            │
+            ▼
+      Read File
+            │
+            ▼
+      Process Claim
+            │
+            ▼
+      run_fnol_agent()
+            │
+            ▼
+      Pipeline
+            │
+            ▼
+      Extraction
+            │
+            ▼
+      Validation
+            │
+            ▼
+      Routing
+            │
+            ▼
+      Excel Logger
+            │
+            ▼
+      Return JSON
+            │
+            ▼
+      Display Dashboard
+            │
+            ▼
+      Download PDF || Download JSON
+```
 
 ## 📋 Routing Rules
 
@@ -209,7 +244,7 @@ Each processed claim stores:
 ## 🧪 Test
 
 ```bash
-python pipeline.py sample_fnols/FNOL_Claim_01_FastTrack.txt
+python pipeline.py sample_fnols/claim1_fasttrack.txt
 ```
 
 ## 🔒 Reliability

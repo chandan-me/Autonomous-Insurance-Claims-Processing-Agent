@@ -4,14 +4,36 @@ pipeline.py
 Top-level orchestration: given raw FNOL text, runs the full agent pipeline
 and returns the final JSON output exactly matching the required schema:
 
-{
-  "extractedFields": {},
-  "missingFields": [],
-  "recommendedRoute": "",
-  "reasoning": ""
-}
-
 This is the single function the UI (or CLI) should call.
+
+        User Uploads FNOL
+                │
+                ▼
+        pipeline.py
+                │
+                ▼
+        extract_fields()
+                │
+                ▼
+        flatten()
+                │
+                ▼
+        find_missing_fields()
+                │
+                ▼
+        determine_route()
+                │
+                ▼
+        Create JSON
+                │
+                ▼
+        log_claim()
+                │
+                ▼
+        Return Output
+                │
+                ▼
+        Streamlit UI
 """
 
 import json

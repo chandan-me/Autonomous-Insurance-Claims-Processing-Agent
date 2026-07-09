@@ -1,8 +1,3 @@
-"""
-app.py
-Professional Streamlit UI for the FNOL Claims Routing Agent.
-"""
-
 import io
 import json
 from reportlab.pdfgen import canvas

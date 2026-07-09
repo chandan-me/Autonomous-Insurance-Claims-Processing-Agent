@@ -1,24 +1,8 @@
 """
-llm_client.py
--------------
 Thin wrapper around the Ollama API (gpt-oss model), configured to use
 Ollama's CLOUD API (https://ollama.com) with an API key instead of a
-locally pulled model. No local model download or `ollama serve` needed.
+locally pulled model. 
 
-Design decision: this is the ONLY file that talks to the LLM. Every call
-goes through call_ollama(), which has a timeout + try/except built in.
-If the API is unreachable, the key is missing/invalid, or the model
-returns bad output, calling code always gets back a clean, predictable
-failure signal (None) instead of an exception bubbling up and crashing
-the whole agent. This is what makes the rest of the pipeline "unbreakable"
-even if the API is down or misconfigured mid-demo.
-
-SETUP:
-  1. Get an API key from https://ollama.com/settings/keys
-  2. Create a `.env` file in the project root (same folder as this file) with:
-       OLLAMA_API_KEY=your-key-here
-  3. Cloud models use a "-cloud" suffix on the model tag, e.g. "gpt-oss:120b-cloud".
-     Adjust MODEL_NAME below if your account uses a different tag.
 """
 
 import os
@@ -26,11 +10,11 @@ import json
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()  # reads .env in the current working directory into os.environ
+load_dotenv()  # this reads .env file in the current working directory into os.environ
 
 # Ollama Cloud's OpenAI-compatible chat endpoint.
 OLLAMA_CLOUD_URL = "https://ollama.com/api/chat"
-MODEL_NAME = "gpt-oss:120b-cloud"   # change to match the exact cloud tag in your account
+MODEL_NAME = "gpt-oss:120b-cloud"  
 REQUEST_TIMEOUT_SECONDS = 60
 
 API_KEY = os.environ.get("OLLAMA_API_KEY")
@@ -55,10 +39,10 @@ def call_ollama(prompt: str, expect_json: bool = False) -> str | None:
         "model": MODEL_NAME,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "options": {"temperature": 0},  # deterministic extraction, not creative
+        "options": {"temperature": 0},  
     }
     if expect_json:
-        payload["format"] = "json"  # Ollama's structured-output mode
+        payload["format"] = "json"  # If JSON output is expected, I request Ollama's structured JSON mode.
 
     try:
         response = requests.post(
