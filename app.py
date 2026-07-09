@@ -12,7 +12,6 @@ from pipeline import run_fnol_agent
 
 st.set_page_config(page_title="Autonomous Insurance Claim", page_icon="🚗", layout="wide")
 
-# st.title("Autonomous Insurance Claims Processing Agent")
 st.markdown("""
 <h1 style="text-align:center; color:#1f4e79;">
 Autonomous Insurance Claims Processing Agent
