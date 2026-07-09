@@ -1,0 +1,9 @@
+streamlit
+pydantic
+requests
+pdfplumber
+openpyxl
+python-dotenv
+pandas
+plotly
+reportlab
