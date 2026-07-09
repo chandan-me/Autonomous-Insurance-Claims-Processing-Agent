@@ -1,136 +1,240 @@
-# FNOL Claims Routing Agent
+#  Autonomous Insurance Claims Processing Agent
 
-A lightweight agent that extracts key fields from FNOL (First Notice of Loss)
-documents, detects missing/inconsistent data, and routes the claim to the
-correct workflow with a human-readable explanation.
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## Why this counts as an "agent"
+An AI-powered insurance claims processing system designed to automate the **First Notice of Loss (FNOL)** workflow. The application intelligently extracts key claim information from TXT and PDF documents, validates mandatory fields, detects incomplete or inconsistent data, and recommends the most appropriate claims processing route using deterministic business rules.
 
-Field extraction uses a local LLM (Ollama, `gpt-oss` model) rather than fixed
-templates — this lets it understand FNOL documents with varying wording and
-layout, not just one exact format. That's the "understanding" part of the
-agent.
+The system combines the flexibility of Large Language Models (LLMs) for document understanding with a reliable rule-based decision engine, ensuring accurate, transparent, and consistent claim routing for every submission.
 
-**Routing itself is deterministic Python, not the LLM.** This is a deliberate
-design choice:
-- Same input always produces the same route (no randomness/hallucination in
-  a business-critical decision).
-- The system keeps working correctly even if Ollama is down — it falls back
-  to regex-based extraction automatically, and the demo never breaks.
-- Every routing decision is traceable to one exact rule, which is what makes
-  the "reasoning" output trustworthy rather than a vague LLM guess.
+---
 
-## Excel Claims Log
+# 🤖 Why This Is an AI Agent
 
-Every processed claim is automatically logged to `claims_log.xlsx` (created
-in the project folder on first run). Each row is keyed by **Policy Number**:
+Unlike traditional parsers that rely on fixed templates or hardcoded formats, this application uses an **Ollama Cloud Large Language Model (LLM)** to understand FNOL documents written in different layouts, formats, and natural language styles.
 
-- New policy number → a new row is appended.
-- Same policy number processed again → the existing row is **updated**, not duplicated.
+The AI agent is responsible for:
 
-Columns include every extracted field plus Missing Fields, Recommended
-Route, Reasoning, Extraction Method (llm/regex_fallback), and a timestamp —
-giving a full audit trail of every routing decision and why it was made.
+- Extracting structured information from unstructured insurance documents.
+- Understanding varying document layouts and wording.
+- Returning standardized claim information in a consistent JSON format.
 
-Logging failures (e.g. the file is open in Excel and locked) never break
-the agent — the JSON result is always returned regardless.
+If the AI model is unavailable or returns invalid output, the application automatically switches to a **regex-based extraction engine**, ensuring uninterrupted processing without affecting the user experience.
 
-## Project Structure
+---
 
+# ⚖️ Reliable Rule-Based Claim Routing
+
+While AI is used for information extraction, **claim routing is intentionally performed using deterministic business rules rather than the LLM**.
+
+This design provides several important advantages:
+
+- ✅ Consistent and repeatable routing decisions.
+- ✅ No hallucinations or unpredictable AI behaviour during business-critical decisions.
+- ✅ Fully transparent and explainable routing logic.
+- ✅ Easy auditing and compliance with insurance business processes.
+- ✅ Reliable performance even when the LLM service is unavailable.
+
+Each routing recommendation includes a clear explanation describing **exactly which rule triggered the decision**, making every result easy to understand and verify.
+
+---
+
+# 📊 Excel Audit Logging
+
+Every processed claim is automatically recorded in **`claims_log.xlsx`**, providing a complete audit trail of all processed insurance claims.
+
+The Excel logger automatically:
+
+- Creates the workbook if it does not already exist.
+- Records every extracted claim field.
+- Stores missing mandatory fields.
+- Saves the recommended routing decision.
+- Logs the reasoning behind every decision.
+- Records the extraction method (LLM or Regex Fallback).
+- Stores confidence information and processing timestamps.
+- Maintains a permanent audit history for future review.
+
+Depending on your logging configuration, claims can either:
+
+- Append new claims as separate records, or
+- Update existing claims using the Policy Number as the unique identifier.
+
+The logging module is completely isolated from the main processing pipeline. If Excel is unavailable (for example, if the workbook is currently open or locked), the application continues processing claims normally and still returns the final routing decision without interruption.
+
+This architecture ensures that reporting failures never impact the core claims processing workflow.
+
+## ✨ Features
+
+- AI-assisted extraction using Ollama Cloud
+- Automatic regex fallback
+- TXT & PDF support
+- Upload up to 4 FNOL documents
+- Streamlit dashboard
+- Rule-based routing engine
+- Excel audit log
+- JSON output
+- PDF report generation
+- Missing field detection
+- Deterministic routing
+
+---
+
+## 🏗 Architecture
+
+```text
+FNOL Document
+      │
+      ▼
+ Streamlit UI
+      │
+      ▼
+LLM Extraction
+      │
+      ├── Success
+      └── Regex Fallback
+             │
+             ▼
+ Field Validation
+             ▼
+ Routing Engine
+             ▼
+ Excel Log + JSON + PDF
 ```
-fnol_agent/
-├── schema.py         # Pydantic schema for all required fields
-├── llm_client.py      # Ollama Cloud API wrapper (with timeout + failure handling)
-├── extractor.py       # LLM extraction + regex fallback
-├── router.py          # Missing-field detection + routing rule engine
-├── excel_logger.py    # Logs every processed claim to claims_log.xlsx (upsert by policy number)
-├── pipeline.py         # Orchestrates the full flow, CLI entry point
-├── app.py             # Streamlit UI for demoing
+
+## 📁 Project Structure
+
+```text
+Insurance_Agent/
+├── app.py
+├── pipeline.py
+├── extractor.py
+├── llm_client.py
+├── router.py
+├── schema.py
+├── excel_logger.py
 ├── requirements.txt
-├── .env.example        # Template for your OLLAMA_API_KEY
-└── sample_fnols/       # 4 dummy FNOL docs, one per routing outcome
-    ├── claim1_fasttrack.txt
-    ├── claim2_missingfields.txt
-    ├── claim3_investigation.txt
-    └── claim4_injury.txt
+├── GUIDE.md
+├── README.md
+├── .env.example
+├── sample_fnols/
+└── claims_log.xlsx
 ```
 
-## 📖 Full Guide
-
-See **`GUIDE.md`** for a complete walkthrough: architecture diagram, what
-each file does, why routing never depends on the LLM, the full routing
-priority table, and verified test results for all 10 sample cases.
-
-## Running Tests
+## 🚀 Installation
 
 ```bash
-python3 test_runner.py
-```
-Runs all 10 sample FNOL documents and prints a pass/fail table comparing
-actual vs. expected routing — useful to run right before a demo.
+git clone https://github.com/chandan-me/Autonomous-Insurance-Claims-Processing-Agent.git
+cd Autonomous-Insurance-Claims-Processing-Agent
 
-## Setup
+python -m venv .venv
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
+
 pip install -r requirements.txt
-cp .env.example .env
 ```
 
-This project uses **Ollama Cloud API** for extraction (no local model download
-or `ollama serve` needed):
+## ⚙️ Configuration
 
-1. Get an API key from https://ollama.com/settings/keys
-2. Copy `.env.example` to `.env` and fill in your values:
-   ```bash
-   cp .env.example .env
-   ```
-3. Update the values in `.env` before running the app.
-4. Check `llm_client.py` — `MODEL_NAME` is set to `"gpt-oss:120b-cloud"`. Update
-   this to match the exact cloud model tag available in your account if different.
+Create a `.env` file:
 
-If the key isn't set, or the API call fails for any reason, extraction
-automatically falls back to regex parsing — the pipeline never crashes.
-
-## Running via CLI
-
-```bash
-python pipeline.py sample_fnols/claim1_fasttrack.txt
+```env
+OLLAMA_API_KEY=YOUR_API_KEY
 ```
 
-## Running the UI
+If no API key is available, the application automatically switches to regex extraction.
+
+## ▶️ Run
 
 ```bash
 streamlit run app.py
 ```
 
-Then upload any file from `sample_fnols/` (or a real FNOL .txt/.pdf) and
-click "Process Claim".
+Visit:
 
-## Routing Rules (priority order, first match wins)
+http://localhost:8501
 
-1. **Manual Review** — any mandatory field is missing.
-2. **Investigation Flag** — description contains "fraud", "inconsistent", or "staged".
-3. **Specialist Queue** — claim type is "injury".
-4. **Fast-track** — estimated damage < ₹25,000.
-5. **Standard Review** — fallback if none of the above apply.
+## 📋 Routing Rules
 
-## Output Format
+| Condition | Route |
+|-----------|-------|
+| Missing mandatory fields | Manual Review |
+| fraud / staged / inconsistent | Investigation Flag |
+| Claim Type = Injury | Specialist Queue |
+| Damage < ₹25,000 | Fast-track |
+| Otherwise | Standard Review |
 
-```json
-{
-  "extractedFields": {},
-  "missingFields": [],
-  "recommendedRoute": "",
-  "reasoning": ""
-}
+## 📊 Dashboard
+
+Displays:
+
+- Claim Status
+- Confidence
+- Risk Level
+- Recommended Route
+- Missing Fields
+- Extracted Fields
+- Decision Reasoning
+- Download JSON
+- Download PDF
+
+## 📈 Excel Logging
+
+Each processed claim stores:
+
+- Claim ID
+- Policy Number
+- Claim Status
+- Recommended Route
+- Confidence
+- Risk Level
+- Missing Fields
+- Reasoning
+- Timestamp
+
+## 🛠 Technologies
+
+- Python
+- Streamlit
+- Ollama Cloud API
+- Pydantic
+- Requests
+- PDFPlumber
+- OpenPyXL
+- Pandas
+- Plotly
+- ReportLab
+
+## 🧪 Test
+
+```bash
+python pipeline.py sample_fnols/FNOL_Claim_01_FastTrack.txt
 ```
 
-## Reliability Notes
+## 🔒 Reliability
 
-- If the API key is missing, the Ollama Cloud API is unreachable, or it
-  returns invalid JSON, extraction automatically falls back to regex
-  parsing — the pipeline never crashes or returns empty output.
-- Routing and missing-field detection never call the LLM, so they are 100%
-  deterministic and testable.
+- Regex fallback
+- Deterministic routing
+- Graceful error handling
+- Isolated Excel logging
+
+## 🌟 Future Work
+
+- OCR
+- Image upload
+- Fraud scoring
+- REST API
+- Docker
+- Authentication
+- Analytics Dashboard
+
+## 👨‍💻 Author
+
+**Chandan N**
+
+GitHub: https://github.com/chandan-me
+
+Email: chandan2004.n@gmail.com
+
+Portfolio: https://www.chandan-n.me/
